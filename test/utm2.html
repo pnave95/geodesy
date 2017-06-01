@@ -1,0 +1,26 @@
+<!doctype html><title>utm</title><meta charset="utf-8">
+<script src="../../../js/geodesy/vector3d.js"></script>
+<script src="../vector3d.js"></script>
+<script src="../../../js/geodesy/latlon-ellipsoidal.js"></script>
+<script src="../latlon-ellipsoidal.js"></script>
+<script src="../../../js/geodesy/utm.js"></script>
+<script src="../utm.js"></script>
+<script src="../../../js/geodesy/dms.js"></script>
+<script src="../dms.js"></script>
+
+<body>
+<p> Hi </p>
+<p id="result"></p>
+</body>
+
+<script>
+    //var utm = Utm.parse('48 N 377298.745 1483034.794');
+    var utm = Utm.parse('13 N 446963 4018669');
+    var latlon = utm.toLatLonE();
+    //console.assert(latlon.toString('dms', 2) == '13°24′45.00″N, 103°52′00.00″E');
+    resultString = latlon.toString('dms',2)
+    lat = latlon.lat
+    lon = latlon.lon
+    document.getElementById("result").innerHTML = resultString
+</script>
+

@@ -1,0 +1,450 @@
+<!doctype html>
+<head>
+    <title>utm to latlon</title>
+    <meta charset="utf-8">
+
+    <script src="vector3d.js"></script>
+    <script src="latlon-ellipsoidal.js"></script>
+    <script src="utm.js"></script>
+    <script src="dms.js"></script>
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+    <script src="PapaParse-4.3.2/papaparse.js"></script>
+    <script src="PapaParse-4.3.2/player/player.js"></script>
+
+    <link rel="stylesheet" href="PapaParse-4.3.2/player/player.css">
+    <style>
+        #map {
+            height: 500px;
+            width: 100%;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="grid-75 text-center">
+	<h2>Enter UTM coordinates in comma separated format</h2>
+
+	<textarea id="input" placeholder="Input">Eastings,Northings,Zone,Hemisphere
+446963,4018669,13,N
+446863,4018604,13,N
+446821,4018606,13,N
+446877,4018611,13,N
+446792,4018645,13,N
+440000,4010000,13,N
+446768,4018681,13,N
+446771,4018742,13,N
+446726,4018806,13,N
+446715,4018849,13,N
+446668,4018953,13,N
+446524,4018947,13,N
+446567,4019019,13,N
+446647,4019036,13,N
+446682,4019040,13,N
+446704,4019059,13,N
+446693,4019046,13,N
+446743,4019067,13,N
+446736,4019067,13,N
+446748,4019068,13,N
+446792,4019091,13,N
+446811,4019134,13,N
+446845,4019152,13,N
+446904,4019161,13,N
+446941,4019180,13,N
+446976,4019193,13,N
+447358,4019059,13,N
+447661,4019218,13,N
+447541,4018665,13,N
+442996,4016874,13,N
+448080,4017150,13,N
+448136,4017493,13,N
+448174,4017588,13,N
+448171,4017610,13,N
+448189,4017691,13,N
+448192,4017717,13,N
+448207,4017828,13,N
+448205,4017886,13,N
+448247,4017952,13,N
+448317,4018064,13,N
+448317,4018075,13,N
+448340,4018128,13,N
+448363,4018187,13,N
+448409,4018326,13,N
+448320,4018307,13,N
+448261,4018285,13,N
+448229,4018291,13,N
+448161,4018322,13,N
+448071,4018362,13,N
+448030,4018368,13,N
+447954,4018349,13,N
+447733,4018371,13,N
+447855,4017932,13,N
+447869,4017692,13,N
+447872,4019197,13,N
+447869,4019225,13,N
+447899,4019187,13,N
+447906,4019201,13,N
+447954,4019171,13,N
+448021,4019111,13,N
+448071,4019062,13,N
+448154,4019037,13,N
+448214,4019043,13,N
+448178,4019108,13,N
+448099,4019120,13,N
+447988,4019301,13,N
+447979,4019276,13,N
+447941,4019256,13,N
+447926,4019222,13,N
+447340,4017507,13,N
+447335,4017528,13,N
+447459,4017551,13,N
+447334,4018513,13,N
+447202,4018524,13,N
+447103,4018500,13,N
+447046,4018503,13,N
+446994,4018480,13,N
+446944,4018451,13,N
+446910,4018419,13,N
+446715,4018416,13,N
+446851,4018406,13,N
+446873,4018410,13,N
+446888,4018417,13,N
+446897,4018418,13,N
+447407,4018189,13,N
+447331,4018182,13,N
+447159,4018013,13,N
+447154,4017998,13,N
+447057,4017849,13,N
+447028,4017862,13,N
+447017,4017838,13,N
+446988,4017831,13,N
+446772,4017675,13,N
+447011,4017841,13,N
+447049,4017851,13,N
+447078,4017892,13,N
+447159,4018005,13,N
+447162,4018026,13,N
+447254,4018167,13,N
+447504,4016576,13,N
+447473,4016591,13,N
+447247,4016576,13,N
+447214,4016552,13,N
+447201,4016548,13,N
+447182,4016549,13,N
+447106,4016668,13,N
+447067,4016688,13,N
+447052,4016693,13,N
+447048,4016695,13,N
+447036,4016704,13,N
+447029,4016727,13,N
+447017,4016742,13,N
+446942,4016984,13,N
+447006,4016985,13,N
+447179,4016935,13,N
+447198,4016939,13,N
+447238,4016966,13,N
+447288,4016953,13,N
+447325,4016961,13,N
+447339,4016970,13,N
+440740,4017000,13,N</textarea>
+
+	<br>
+	<b>or</b>
+	<br>
+
+	<input type="file" id="files" multiple>
+
+	<br><br>
+
+	<button id="submit-parse">Convert</button>
+	&nbsp;
+	<!--<button id="submit-unparse">Unparse</button>-->
+
+	<br><br>
+
+	<br><br><br>
+</div>
+
+
+
+<div class="grid-75 text-center">
+	<h2>Result:  latitude, longitude coordinates</h2>
+
+	<textarea id="output" placeholder="Output">Latitude, Longitude</textarea>
+
+	<br>
+	<br>
+    <button id="plot-points">Plot Points</button>
+    <br>
+    <br>
+</div>
+
+
+<div id="map">Google Map will go here</div>
+
+
+
+</body>
+
+
+
+
+<script>
+/*function myMap() {
+var mapOptions = {
+    center: new google.maps.LatLng(51.5, -0.12),
+    zoom: 10,
+    mapTypeId: google.maps.MapTypeId.HYBRID
+}
+var map = new google.maps.Map(document.getElementById("map"), mapOptions);
+}*/
+
+var map;
+var markers = [];
+coordinates = [["latitude", "longitude"]];
+
+function addMapMarker(latlng){
+    //var pt = {lat: latitude, lng: longitude};
+    var marker = new google.maps.Marker({
+        position: latlng,
+        map: map
+    });
+} 
+
+function plotPoints(coordinates, map){
+    N = coordinates.length;
+    console.log("N = ", N);
+    for(i=1; i<N; i++){
+        latitude = coordinates[i][0];
+        longitude = coordinates[i][1];
+        latlng = {lat: latitude, lng: longitude};
+        
+        // debug:
+        console.log("Processed marker i=", i);
+        console.log(map);
+        
+        var marker = new google.maps.Marker({
+            position: latlng,
+            visible: true,
+            map: map
+        });
+        
+        markers.push(marker);
+    }
+    
+    // set/show all markers
+    for(var j=0; j < markers.length; j++){
+        markers[j].setMap(map);
+    }
+}
+    
+
+function initMap(){
+    var uluru = {lat: -25.363, lng: 131.044};
+    var map = new google.maps.Map(document.getElementById('map'), {
+        center: uluru,
+        zoom: 4
+    });
+    document.getElementById('plot-points').addEventListener("click", plotPoints(coordinates, map));
+    //document.getElementById('plot-points').addEventListener("click", setTimeout(plotPoints(coordinates),500));
+    //google.maps.event.addListener(map)
+    
+    point = {lat: 35.0, lng: -105.5};
+    map.setCenter(point);
+    
+    var marker = new google.maps.Marker({
+        position: {lat: 35.0, lng: -100.5},
+        map: map
+    });
+}
+    
+function initialize(){
+    // create empty LagLngBounds object
+    var bounds = new google.maps.LatLngBounds();
+    
+    var center_pt = {lat: 35.0, lng: -105.5};
+    var map = new google.maps.Map(document.getElementById('map'), {
+        center: center_pt,
+        zoom: 8
+    });
+    
+    N = coordinates.length;
+    console.log("N = ", N);
+    for(i=1; i<N; i++){
+        latitude = coordinates[i][0];
+        longitude = coordinates[i][1];
+        latlng = {lat: latitude, lng: longitude};
+        
+        // debug:
+        console.log("Processed marker i=", i);
+        console.log(map);
+        
+        var marker = new google.maps.Marker({
+            position: latlng,
+            //visible: true,
+            map: map
+        });
+        
+        markers.push(marker);
+        
+        // extend LatLngBounds
+        bounds.extend(marker.position);
+    }
+    
+    // fit the map to the new bounds (TODO: what if N = 0?)
+    map.fitBounds(bounds);
+    
+    
+}
+    
+$(document).ready(function(){
+    $('#plot-points').on('click', initialize)
+});
+    
+/*
+function changeMapCenter(latitude, longitude){
+    centerPt = {lat: latitude, lng: longitude};
+    map.center
+}
+*/
+$('#plot-points').on('click', function(){
+    plotPoints(coordinates);
+});
+
+// Experiment:  try parsing then converting coordinates on button click
+var stepped = 0, chunks = 0, rows = 0;
+var start, end;
+var parser;
+var pauseChecked = false;
+var printStepChecked = false;
+
+$('#submit-parse').click(function()
+//function convert_and_plot()
+{
+	clicked = true;
+
+	stepped = 0;
+	chunks = 0;
+	rows = 0;
+
+	var txt = $('#input').val();
+	var localChunkSize = $('#localChunkSize').val();
+	var remoteChunkSize = $('#remoteChunkSize').val();
+	var files = $('#files')[0].files;
+	var config = buildConfig();
+
+	// NOTE: Chunk size does not get reset if changed and then set back to empty/default value
+	if (localChunkSize)
+		Papa.LocalChunkSize = localChunkSize;
+	if (remoteChunkSize)
+		Papa.RemoteChunkSize = remoteChunkSize;
+
+	pauseChecked = $('#step-pause').prop('checked');
+	printStepChecked = $('#print-steps').prop('checked');
+
+
+	if (files.length > 0)
+	{
+		if (!$('#stream').prop('checked') && !$('#chunk').prop('checked'))
+		{
+			for (var i = 0; i < files.length; i++)
+			{
+				if (files[i].size > 1024 * 1024 * 10)
+				{
+					alert("A file you've selected is larger than 10 MB; please choose to stream or chunk the input to prevent the browser from crashing.");
+					return;
+				}
+			}
+		}
+
+		start = performance.now();
+		
+		$('#files').parse({
+			config: config,
+			before: function(file, inputElem)
+			{
+				console.log("Parsing file:", file);
+			},
+			complete: function()
+			{
+				console.log("Done with all files.");
+			}
+		});
+	}
+	else
+	{
+		start = performance.now();
+		var results = Papa.parse(txt, config);
+		console.log("Synchronous parse results:", results);
+	}
+
+	// Test to see if this works properly
+	//console.log("Results file: ", results.data[0][2])
+	zone = results.data[1][2]
+	hem = results.data[1][3]
+	E = results.data[1][0]
+	N = results.data[1][1]
+	firstUTMstring = zone + " " + hem + " " + E + " " + N
+	console.log("firstUTMstring:  ", firstUTMstring)
+
+	// Iterate through the parsed UTM coordinate data and convert to lat/lon coordinates
+	coordinates = [["latitude", "longitude"]]
+	NumPts = results.data.length -1 // TODO:  handle the case that some of the rows in 'results' are blank; also handle the case that a header is not included
+	console.log("# pts = ", NumPts)
+
+	outputstring = "Latitude, Longitude \n"
+
+	for(i=1; i <= NumPts; i++){
+		zone = results.data[i][2];
+		hem = results.data[i][3];
+		E = results.data[i][0];
+		N = results.data[i][1];
+		UTMstring = zone + " " + hem + " " + E + " " + N;
+		utm = Utm.parse(UTMstring);
+		latlon = utm.toLatLonE();
+		lat = latlon.lat;
+		lon = latlon.lon;
+		coord = [lat, lon];
+		coordinates.push(coord);
+
+		outputstring += lat + ", " + lon + "\n"
+	}
+
+	console.log("coordinates.length = ", coordinates.length)
+	document.getElementById("output").innerHTML = outputstring
+    
+    // change the center of the map to the first data point
+    newcenter = {lat: coordinates[1][0], lng: coordinates[1][1]};
+    console.log("newcenter: ", coordinates[1])
+    //map.setCenter(newcenter);
+    //addMapMarker(newcenter);
+});
+    
+</script>
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBaVjGoI0d6hO0dmNU0hXfTInVcaUtZzd4 	
+&callback=initMap"
+    async defer></script>
+
+<script>
+	clicked = false;
+    //var utm = Utm.parse('48 N 377298.745 1483034.794');
+    var utm = Utm.parse('13 N 446963 4018669');
+    var latlon = utm.toLatLonE();
+    //console.assert(latlon.toString('dms', 2) == '13°24′45.00″N, 103°52′00.00″E');
+    resultString = latlon.toString('dms',2)
+    lat = latlon.lat
+    lon = latlon.lon
+    //document.getElementById("result").innerHTML = resultString
+
+    //arr = [["col1", "col2"], ["val1", "val2"]]
+    //console.log(arr[0][1])
+
+
+    //console.log("Button was clicked! ", results.data.length)
+</script>
+
+
+<!--<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBu-916DdpKAjTmJNIgngS6HL_kDIKU0aU&callback=myMap"></script>-->
